@@ -1672,6 +1672,10 @@ public class DataNode extends Configured
     return dn;
   }
 
+  public void joinDataNode(){
+	join();
+	}
+
   void join() {
     if (dataNodeThread != null) {
       try {
