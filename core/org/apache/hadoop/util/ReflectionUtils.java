@@ -21,7 +21,8 @@ package org.apache.hadoop.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.io.*;
-import java.lang.management.*;
+//johnu TODO
+//import java.lang.management.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -117,13 +118,14 @@ public class ReflectionUtils {
     setConf(result, conf);
     return result;
   }
-
-  static private ThreadMXBean threadBean = 
-    ManagementFactory.getThreadMXBean();
-    
-  public static void setContentionTracing(boolean val) {
-    threadBean.setThreadContentionMonitoringEnabled(val);
-  }
+//johnu TODO
+//  static private ThreadMXBean threadBean = 
+//    ManagementFactory.getThreadMXBean();
+  
+//johnu TODO  
+//  public static void setContentionTracing(boolean val) {
+//    threadBean.setThreadContentionMonitoringEnabled(val);
+//  }
     
   private static String getTaskName(long id, String name) {
     if (name == null) {
@@ -141,7 +143,8 @@ public class ReflectionUtils {
   public static void printThreadInfo(PrintWriter stream,
                                      String title) {
     final int STACK_DEPTH = 20;
-    boolean contention = threadBean.isThreadContentionMonitoringEnabled();
+//johnu TODO
+/*    boolean contention = threadBean.isThreadContentionMonitoringEnabled();
     long[] threadIds = threadBean.getAllThreadIds();
     stream.println("Process Thread Dump: " + title);
     stream.println(threadIds.length + " active threads");
@@ -174,7 +177,7 @@ public class ReflectionUtils {
       for (StackTraceElement frame: info.getStackTrace()) {
         stream.println("    " + frame.toString());
       }
-    }
+    }*/
     stream.flush();
   }
     

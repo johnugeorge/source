@@ -65,7 +65,7 @@ abstract public class Shell {
   /** Return a Unix command to get permission information. */
   public static String[] getGET_PERMISSION_COMMAND() {
     //force /bin/ls, except on windows.
-    return new String[] {(WINDOWS ? "ls" : "/bin/ls"), "-ld"};
+    return new String[] {(WINDOWS ? "ls" : "/system/bin/ls"), "-ld"};
   }
 
   /**Time after which the executing script would be timedout*/

@@ -11,7 +11,9 @@
 
 <property>
   <name>hadoop.tmp.dir</name>
-  <value>/tmp/hadoop-${user.name}</value>
+  <!-- johnu TODO 
+	<value>/tmp/hadoop-${user.name}</value> -->
+  <value>/data/hadoop</value>
   <description>A base for other temporary directories.</description>
 </property>
 
@@ -150,7 +152,9 @@
 
 <property>
   <name>fs.default.name</name>
-  <value>file:///</value>
+  <!--//johnu TODO
+       <value>file:///</value>!-->
+  <value>hdfs://localhost:9000</value>
   <description>The name of the default file system.  A URI whose
   scheme and authority determine the FileSystem implementation.  The
   uri's scheme determines the config property (fs.SCHEME.impl) naming

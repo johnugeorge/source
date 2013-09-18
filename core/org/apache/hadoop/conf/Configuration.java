@@ -1127,14 +1127,15 @@ public class Configuration implements Iterable<Map.Entry<String,String>>,
 
       //allow includes in the xml file
       docBuilderFactory.setNamespaceAware(true);
-      try {
-          docBuilderFactory.setXIncludeAware(true);
-      } catch (UnsupportedOperationException e) {
-        LOG.error("Failed to set setXIncludeAware(true) for parser "
-                + docBuilderFactory
-                + ":" + e,
-                e);
-      }
+	//johnu TODO
+      //try {
+      //    docBuilderFactory.setXIncludeAware(true);
+      //} catch (UnsupportedOperationException e) {
+      //  LOG.error("Failed to set setXIncludeAware(true) for parser "
+      //          + docBuilderFactory
+      //          + ":" + e,
+      //          e);
+      //}
       DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
       Document doc = null;
       Element root = null;

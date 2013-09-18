@@ -33,7 +33,8 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.security.auth.Subject;
-import javax.security.auth.kerberos.KerberosTicket;
+//johnu TODO
+//import javax.security.auth.kerberos.KerberosTicket;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -92,6 +93,8 @@ public class SecurityUtil {
    * @throws IOException
    *           if TGT can't be found
    */
+ //johnu TODO
+  /*
   private static KerberosTicket getTgtFromSubject() throws IOException {
     Subject current = Subject.getSubject(AccessController.getContext());
     if (current == null) {
@@ -106,7 +109,7 @@ public class SecurityUtil {
     }
     throw new IOException("Failed to find TGT from current Subject:"+current);
   }
-  
+  */
   // Original TGT must be of form "krbtgt/FOO@FOO". Verify this
   protected static boolean isOriginalTGT(String name) {
     if(name == null) return false;
@@ -136,7 +139,8 @@ public class SecurityUtil {
   public static void fetchServiceTicket(URL remoteHost) throws IOException {
     if(!UserGroupInformation.isSecurityEnabled())
       return;
-    
+    //johnu TODO
+   /* 
     String serviceName = KerberosUtil.getServicePrincipal("host",
         remoteHost.getHost());
     if (LOG.isDebugEnabled())
@@ -189,7 +193,7 @@ public class SecurityUtil {
     } catch (Exception e) {
       throw new IOException("Can't get service ticket for: "
           + serviceName, e);
-    }
+    }*/
   }
   
   /**
@@ -306,6 +310,9 @@ public class SecurityUtil {
   public static void login(final Configuration conf,
       final String keytabFileKey, final String userNameKey, String hostname)
       throws IOException {
+      //johnu TODO
+      return;
+    /*
     String keytabFilename = conf.get(keytabFileKey);
     if (keytabFilename == null)
       return;
@@ -314,7 +321,7 @@ public class SecurityUtil {
         .getProperty("user.name"));
     String principalName = SecurityUtil.getServerPrincipal(principalConfig,
         hostname);
-    UserGroupInformation.loginUserFromKeytab(principalName, keytabFilename);
+    UserGroupInformation.loginUserFromKeytab(principalName, keytabFilename);*/
   }
 
   /**
