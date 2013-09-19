@@ -246,9 +246,10 @@ public abstract class FileSystem extends Configured implements Closeable {
     if (scheme == null && authority == null) {     // use default FS
       return get(conf);
     }
-
+	
     if (scheme != null && authority == null) {     // no authority
       URI defaultUri = getDefaultUri(conf);
+    LOG.error("Scheme and authority is not null. Scheme " + scheme + " auth "+authority + " uri "+uri + " defaultUri "+defaultUri);
       if (scheme.equals(defaultUri.getScheme())    // if scheme matches default
           && defaultUri.getAuthority() != null) {  // & default has authority
         return get(defaultUri, conf);              // return default
@@ -1453,6 +1454,8 @@ public abstract class FileSystem extends Configured implements Closeable {
 
     FileSystem get(URI uri, Configuration conf) throws IOException{
       Key key = new Key(uri, conf);
+      if (key == null)
+    	LOG.error("Error in key creation " + uri);
       FileSystem fs = null;
       synchronized (this) {
         fs = map.get(key);
@@ -1460,7 +1463,6 @@ public abstract class FileSystem extends Configured implements Closeable {
       if (fs != null) {
         return fs;
       }
-      
       fs = createFileSystem(uri, conf);
       synchronized (this) {  // refetch the lock again
         FileSystem oldfs = map.get(key);

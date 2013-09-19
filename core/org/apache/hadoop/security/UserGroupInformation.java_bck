@@ -95,6 +95,7 @@ public class UserGroupInformation {
 
     @Override
     public boolean commit() throws LoginException {
+    LOG.error("newLogin Commit " );
       if (LOG.isDebugEnabled()) {
         LOG.debug("hadoop login commit");
       }
@@ -105,6 +106,7 @@ public class UserGroupInformation {
         }
         return true;
       }
+    LOG.error("newLogin Commit 1" );
       Principal user = null;
       // if we are using kerberos, try it out
       //johnu TODO
@@ -126,6 +128,7 @@ public class UserGroupInformation {
       	LOG.error("newLogin commit " + envUser + " " +user);
         user = envUser == null ? null : new User(envUser);
       }
+      LOG.error("newLogin Commit 2"+ user );
       // use the OS user
       if (user == null) {
         user = getCanonicalUser(OS_PRINCIPAL_CLASS);
@@ -133,6 +136,7 @@ public class UserGroupInformation {
           LOG.debug("using local user:"+user);
         }
       }
+      LOG.error("newLogin Commit 3 "+ user );
       // if we found the user, add our principal
       if (user != null) {
         subject.getPrincipals().add(new User(user.getName()));
@@ -150,14 +154,17 @@ public class UserGroupInformation {
 
     @Override
     public boolean login() throws LoginException {
+      LOG.error("newLogin login");
       if (LOG.isDebugEnabled()) {
         LOG.debug("hadoop login");
       }
+      LOG.error("newLogin login exit ");
       return true;
     }
 
     @Override
     public boolean logout() throws LoginException {
+      LOG.error("newLogin logout");
       if (LOG.isDebugEnabled()) {
         LOG.debug("hadoop logout");
       }
@@ -450,8 +457,7 @@ public class UserGroupInformation {
       return null;
     }
   }
-  //johnu TODO
- /* 
+  
   private static LoginContext
   newLoginContext(String appName, Subject subject) throws LoginException {
     // Temporarily switch the thread's ContextClassLoader to match this
@@ -472,6 +478,7 @@ public class UserGroupInformation {
       t.setContextClassLoader(oldCCL);
     }
   }
+
   private LoginContext getLogin() {
     return user.getLogin();
   }
@@ -480,7 +487,6 @@ public class UserGroupInformation {
     user.setLogin(login);
   }
 
-*/
   private static String prependFileAuthority(String keytabPath) {
     return keytabPath.startsWith("file://") ? keytabPath
         : "file://" + keytabPath;
@@ -493,8 +499,8 @@ public class UserGroupInformation {
    */
   UserGroupInformation(Subject subject) {
     this.subject = subject;
+    this.user = subject.getPrincipals(User.class).iterator().next();
     //johnu TODO
-    this.user = new User("hadoop-user");
 	this.isKeytab =false;
 	this.isKrbTkt =false;
     //this.isKeytab = !subject.getPrivateCredentials(KerberosKey.class).isEmpty();
@@ -516,17 +522,6 @@ public class UserGroupInformation {
    */
   public synchronized
   static UserGroupInformation getCurrentUser() throws IOException {
-	//johnu TODO
-    AccessControlContext context = AccessController.getContext();
-    Subject subject = Subject.getSubject(context);
-    if (subject == null) {
-        LOG.error("4 " );
-      return getLoginUser();
-    } else {
-        LOG.error("5 " );
-      return new UserGroupInformation(subject);
-    }
-	/*
         LOG.error("1 " );
     AccessControlContext context = AccessController.getContext();
         LOG.error("2 " );
@@ -538,7 +533,7 @@ public class UserGroupInformation {
     } else {
         LOG.error("5 " );
       return new UserGroupInformation(subject);
-    }*/
+    }
   }
 
   /**
@@ -549,39 +544,42 @@ public class UserGroupInformation {
   public synchronized 
   static UserGroupInformation getLoginUser() throws IOException {
     if (loginUser == null) {
-      //johnu TODO
-	//try 
-	{
+      try {
+        LOG.error("6 " );
         Subject subject = new Subject();
-	//johnu TODO
-        /*LoginContext login;
+        LoginContext login;
         
 	if (isSecurityEnabled()) {
           login = newLoginContext(HadoopConfiguration.USER_KERBEROS_CONFIG_NAME, subject);
         } else {
           login = newLoginContext(HadoopConfiguration.SIMPLE_CONFIG_NAME, subject);
-        }*/
-	//johnu TODO
-        //login.login();
+        }
+        LOG.error("7 " );
+        LOG.error("7 new " );
+	if(login == null)
+		LOG.error("Object is null " );
+        login.login();
+        LOG.error("8 " );
         UserGroupInformation realUser = new UserGroupInformation(subject);
-	//johnu TODO
-        //realUser.setLogin(login);
+        LOG.error("9 " );
+        realUser.setLogin(login);
+        LOG.error("71 " );
         realUser.setAuthenticationMethod(isSecurityEnabled() ?
                                           AuthenticationMethod.KERBEROS :
                                           AuthenticationMethod.SIMPLE);
-	//johnu TODO
-        realUser = new UserGroupInformation(subject);
-
-
+        realUser = new UserGroupInformation(login.getSubject());
+        LOG.error("72 " );
         // If the HADOOP_PROXY_USER environment variable or property
         // is specified, create a proxy user as the logged in user.
         String proxyUser = System.getenv(HADOOP_PROXY_USER);
+        LOG.error("73 " );
         if (proxyUser == null) {
           proxyUser = System.getProperty(HADOOP_PROXY_USER);
         }
         loginUser = proxyUser == null ? realUser : createProxyUser(proxyUser, realUser);
-//johnu TODO
-        /*String fileLocation = System.getenv(HADOOP_TOKEN_FILE_LOCATION);
+        LOG.error("74 " );
+
+        String fileLocation = System.getenv(HADOOP_TOKEN_FILE_LOCATION);
         LOG.error("75 " );
         if (fileLocation != null && isSecurityEnabled()) {
           // load the token storage file and put all of the tokens into the
@@ -593,14 +591,14 @@ public class UserGroupInformation {
             loginUser.addToken(token);
         LOG.error("77 " );
           }
-        }*/
+        }
+        LOG.error("78 " );
         loginUser.spawnAutoRenewalThreadForUserCreds();
-      } 
-      //johnu TODO
-        /*catch (LoginException le) {
+        LOG.error("79 " );
+      } catch (LoginException le) {
         LOG.debug("failure to login", le);
         throw new IOException("failure to login", le);
-      }*/
+      }
       if (LOG.isDebugEnabled()) {
         LOG.debug("UGI loginUser:"+loginUser);
       }

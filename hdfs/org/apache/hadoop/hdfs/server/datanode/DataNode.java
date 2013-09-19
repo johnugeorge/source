@@ -84,7 +84,8 @@ import org.apache.hadoop.hdfs.server.common.HdfsConstants.StartupOption;
 import org.apache.hadoop.hdfs.server.common.IncorrectVersionException;
 import org.apache.hadoop.hdfs.server.datanode.FSDataset.VolumeInfo;
 import org.apache.hadoop.hdfs.server.datanode.SecureDataNodeStarter.SecureResources;
-import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeInstrumentation;
+//johnu TODO
+//import org.apache.hadoop.hdfs.server.datanode.metrics.DataNodeInstrumentation;
 import org.apache.hadoop.hdfs.server.datanode.web.resources.DatanodeWebHdfsMethods;
 import org.apache.hadoop.hdfs.server.namenode.FSNamesystem;
 import org.apache.hadoop.hdfs.server.namenode.FileChecksumServlets;
@@ -112,14 +113,17 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.ipc.RPC;
 import org.apache.hadoop.ipc.RemoteException;
 import org.apache.hadoop.ipc.Server;
-import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
-import org.apache.hadoop.metrics2.util.MBeans;
+//johnu TODO
+//import org.apache.hadoop.metrics2.lib.DefaultMetricsSystem;
+//import org.apache.hadoop.metrics2.util.MBeans;
 import org.apache.hadoop.net.DNS;
 import org.apache.hadoop.net.NetUtils;
 import org.apache.hadoop.security.AccessControlException;
 import org.apache.hadoop.security.SecurityUtil;
+
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.UserGroupInformation.AuthenticationMethod;
+
 import org.apache.hadoop.security.authorize.ServiceAuthorizationManager;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.security.token.TokenIdentifier;
@@ -220,7 +224,9 @@ public class DataNode extends Configured
   long heartBeatInterval;
   private DataStorage storage = null;
   private HttpServer infoServer = null;
-  DataNodeInstrumentation myMetrics;
+  //johnu TODO
+  //DataNodeInstrumentation myMetrics;
+
   private static InetSocketAddress nameNodeAddr;
   private InetSocketAddress selfAddr;
   private static DataNode datanodeObject = null;
@@ -313,7 +319,6 @@ public class DataNode extends Configured
     super(conf);
     SecurityUtil.login(conf, DFSConfigKeys.DFS_DATANODE_KEYTAB_FILE_KEY, 
         DFSConfigKeys.DFS_DATANODE_USER_NAME_KEY);
-
     datanodeObject = this;
     durableSync = conf.getBoolean("dfs.durable.sync", true);
     this.userWithLocalPathAccess = conf
@@ -343,6 +348,7 @@ public class DataNode extends Configured
   void startDataNode(Configuration conf, 
                      AbstractList<File> dataDirs, SecureResources resources
                      ) throws IOException {
+    LOG.error("Main Starting DataNode");
     if(UserGroupInformation.isSecurityEnabled() && resources == null)
       throw new RuntimeException("Cannot start secure cluster without " +
       		"privileged resources.");
@@ -368,6 +374,7 @@ public class DataNode extends Configured
     this.transferToAllowed = conf.getBoolean("dfs.datanode.transferTo.allowed", 
                                              true);
     this.writePacketSize = conf.getInt("dfs.write.packet.size", 64*1024);
+    LOG.error("Main Starting DataNode 1");
 
     this.relaxedVersionCheck = conf.getBoolean(
         CommonConfigurationKeys.HADOOP_RELAXED_VERSION_CHECK_KEY,
@@ -381,6 +388,7 @@ public class DataNode extends Configured
     storage = new DataStorage();
     // construct registration
     this.dnRegistration = new DatanodeRegistration(machineName + ":" + tmpPort);
+    LOG.error("Main Starting DataNode 2");
 
     // connect to name node
     this.namenode = (DatanodeProtocol) 
@@ -418,9 +426,10 @@ public class DataNode extends Configured
       // initialize data node internal structure
       this.data = new FSDataset(storage, conf);
     }
-      
+    LOG.error("Main Starting DataNode 3");
+    //johnu TODO  
     // register datanode MXBean
-    this.registerMXBean(conf); // register the MXBean for DataNode
+    //this.registerMXBean(conf); // register the MXBean for DataNode
     
     // Allow configuration to delay block reports to find bugs
     artificialBlockReceivedDelay = conf.getInt(
@@ -442,6 +451,7 @@ public class DataNode extends Configured
                                      tmpPort);
     this.dnRegistration.setName(machineName + ":" + tmpPort);
     LOG.info("Opened data transfer server at " + tmpPort);
+    LOG.error("Main Starting DataNode 4 "+ tmpPort);
       
     this.threadGroup = new ThreadGroup("dataXceiverServer");
     this.dataXceiverServer = new Daemon(threadGroup, 
@@ -477,6 +487,7 @@ public class DataNode extends Configured
                                        DFSConfigKeys.DFS_DATANODE_SYNCONCLOSE_DEFAULT);
 
     DataNode.nameNodeAddr = nameNodeAddr;
+    LOG.error("Main Starting DataNode 5");
 
     //initialize periodic block scanner
     String reason = null;
@@ -536,8 +547,11 @@ public class DataNode extends Configured
     this.infoServer.start();
     // adjust info port
     this.dnRegistration.setInfoPort(this.infoServer.getPort());
-    myMetrics = DataNodeInstrumentation.create(conf,
-                                               dnRegistration.getStorageID());
+    LOG.error("Main Starting DataNode 6");
+
+    //johnu TODO
+    //myMetrics = DataNodeInstrumentation.create(conf,
+    //                                           dnRegistration.getStorageID());
     
     // set service-level authorization security policy
     if (conf.getBoolean(
@@ -568,6 +582,7 @@ public class DataNode extends Configured
         LOG.warn("ServicePlugin " + p + " could not be started", t);
       }
     }
+    LOG.error("Main Starting DataNode 7");
   }
   
   private ObjectName mxBean = null;
@@ -579,12 +594,14 @@ public class DataNode extends Configured
     // We wrap to bypass standard mbean naming convention.
     // This wraping can be removed in java 6 as it is more flexible in 
     // package naming for mbeans and their impl.
-    mxBean = MBeans.register("DataNode", "DataNodeInfo", this);
+	//johnu TODO
+    //mxBean = MBeans.register("DataNode", "DataNodeInfo", this);
   }
   
   public void unRegisterMXBean() {
-    if (mxBean != null)
-      MBeans.unregister(mxBean);
+	//johnu TODO
+    //if (mxBean != null)
+     // MBeans.unregister(mxBean);
   }
   
   /**
@@ -687,12 +704,13 @@ public class DataNode extends Configured
   public static InterDatanodeProtocol createInterDataNodeProtocolProxy(
       DatanodeInfo info, final Configuration conf, final int socketTimeout,
       boolean connectToDnViaHostname) throws IOException {
+    
     final String dnName = info.getNameWithIpcPort(connectToDnViaHostname);
     final InetSocketAddress addr = NetUtils.createSocketAddr(dnName);
     if (InterDatanodeProtocol.LOG.isDebugEnabled()) {
       InterDatanodeProtocol.LOG.info("InterDatanodeProtocol addr=" + addr);
     }
-
+    
     UserGroupInformation loginUgi = UserGroupInformation.getLoginUser();
     try {
       return loginUgi
@@ -715,10 +733,10 @@ public class DataNode extends Configured
   public InetSocketAddress getSelfAddr() {
     return selfAddr;
   }
-    
-  DataNodeInstrumentation getMetrics() {
-    return myMetrics;
-  }
+   //johnu TODO 
+  //DataNodeInstrumentation getMetrics() {
+  //  return myMetrics;
+  //}
   
   /**
    * Return the namenode's identifier
@@ -852,8 +870,8 @@ public class DataNode extends Configured
         }
       }
     }
-    
-    this.unRegisterMXBean();
+    //johnu TODO 
+    //this.unRegisterMXBean();
     if (infoServer != null) {
       try {
         infoServer.stop();
@@ -917,9 +935,10 @@ public class DataNode extends Configured
     if (data != null) {
       data.shutdown();
     }
-    if (myMetrics != null) {
-      myMetrics.shutdown();
-    }
+	//johnu TODO
+    //if (myMetrics != null) {
+      //myMetrics.shutdown();
+    //}
   }
   
   
@@ -1035,7 +1054,8 @@ public class DataNode extends Configured
                                                        data.getRemaining(),
                                                        xmitsInProgress.get(),
                                                        getXceiverCount());
-          myMetrics.addHeartBeat(now() - startTime);
+	//johnu TODO
+          //myMetrics.addHeartBeat(now() - startTime);
           if (!processCommand(cmds))
             continue;
         }
@@ -1088,7 +1108,8 @@ public class DataNode extends Configured
             // Log the block report processing stats from Datanode perspective
             long brSendCost = now() - brSendStartTime;
             long brCreateCost = brSendStartTime - brCreateStartTime;
-            myMetrics.addBlockReport(brSendCost);
+		//johnu TODO
+            //myMetrics.addBlockReport(brSendCost);
             LOG.info("BlockReport of " + bReport.length
                 + " blocks took " + brCreateCost + " msec to generate and "
                 + brSendCost + " msecs for RPC and NN processing");
@@ -1225,7 +1246,8 @@ public class DataNode extends Configured
     case DatanodeProtocol.DNA_TRANSFER:
       // Send a copy of a block to another datanode
       transferBlocks(bcmd.getBlocks(), bcmd.getTargets());
-      myMetrics.incrBlocksReplicated(bcmd.getBlocks().length);
+	//johnu TODO
+ //     myMetrics.incrBlocksReplicated(bcmd.getBlocks().length);
       break;
     case DatanodeProtocol.DNA_INVALIDATE:
       //
@@ -1242,7 +1264,8 @@ public class DataNode extends Configured
         // Exceptions caught here are not expected to be disk-related.
         throw e;
       }
-      myMetrics.incrBlocksRemoved(toDelete.length);
+	//johnu TODO
+      //myMetrics.incrBlocksRemoved(toDelete.length);
       break;
     case DatanodeProtocol.DNA_SHUTDOWN:
       // shut down the data node
@@ -1648,7 +1671,8 @@ public class DataNode extends Configured
     String[] dataDirs = conf.getStrings(DATA_DIR_KEY);
     dnThreadName = "DataNode: [" +
                         StringUtils.arrayToString(dataDirs) + "]";
-    DefaultMetricsSystem.initialize("DataNode");
+    //johnu TODO
+    //DefaultMetricsSystem.initialize("DataNode");
     return makeInstance(dataDirs, conf, resources);
   }
 
@@ -1657,6 +1681,7 @@ public class DataNode extends Configured
    */
   public static DataNode createDataNode(String args[],
                                  Configuration conf) throws IOException {
+    System.out.println("Main creating DataNode");
     return createDataNode(args, conf, null);
   }
   
@@ -1875,7 +1900,8 @@ public class DataNode extends Configured
     data.updateBlock(oldblock, newblock);
     if (finalize) {
       data.finalizeBlockIfNeeded(newblock);
-      myMetrics.incrBlocksWritten();
+	//johnu TODO
+      //myMetrics.incrBlocksWritten();
       notifyNamenodeReceivedBlock(newblock, EMPTY_DEL_HINT);
       LOG.info("Received " + newblock +
                 " of size " + newblock.getNumBytes() +
@@ -1939,7 +1965,8 @@ public class DataNode extends Configured
         }
       }
     }
-    myMetrics.incrBlocksGetLocalPathInfo();
+//johnu TODO
+//    myMetrics.incrBlocksGetLocalPathInfo();
     return info;
   }
   
